@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { AnimalEvaluation, AnswerLevel } from '../types/checklist';
-import { v4 as uuidv4 } from 'uuid'; // need to install uuid or generate simple id
 
 // Simpler UUID generation without external dependency
 const generateId = () => Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
