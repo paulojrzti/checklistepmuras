@@ -1,11 +1,21 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { AppShell } from "../components/layout/AppShell";
 
 const inter = Inter({
   subsets: ["latin"],
+  variable: "--font-inter",
 });
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair",
+});
+
+export const viewport: Viewport = {
+  themeColor: "#123C2F",
+};
 
 export const metadata: Metadata = {
   title: "Checklist EPMURAS | Compra de Gado",
@@ -18,8 +28,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className={`${inter.className} h-full antialiased`}>
-      <body suppressHydrationWarning className="min-h-full flex flex-col bg-brand-beige text-brand-gray">
+    <html lang="pt-BR" className={`${inter.variable} ${playfair.variable} h-full antialiased`}>
+      <body suppressHydrationWarning className="min-h-full flex flex-col bg-brand-beige text-brand-gray font-sans">
         <AppShell>
           {children}
         </AppShell>

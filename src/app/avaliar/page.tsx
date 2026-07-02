@@ -7,26 +7,56 @@ import { useHistoryStore } from "../../store/useHistoryStore";
 import { Button } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Card";
 import { Badge } from "../../components/ui/Badge";
-import { StepLayout, EvaluationStepper, AnswerCard, GuidanceCard } from "../../components/wizard/WizardComponents";
+import { StepLayout, EvaluationStepper, WizardSidebar, AnswerCard, GuidanceCard } from "../../components/wizard/WizardComponents";
 import { epmurasQuestions, commercialQuestions } from "../../data/questions";
 import { breedGroupsInfo } from "../../data/breeds";
 import { objectiveInfo } from "../../data/objectives";
 import { vetosList } from "../../data/vetos";
-import { 
-  getBreedGuidance, 
-  getObjectiveGuidance, 
-  calculateEpmurasScore, 
-  calculateCommercialScore, 
-  calculateFinalScore, 
-  hasAutomaticVeto, 
-  getDecision, 
-  getDecisionText, 
-  getEpmurasClassification, 
-  getStrengths, 
-  getWarnings 
+import {
+  getBreedGuidance,
+  getObjectiveGuidance,
+  calculateEpmurasScore,
+  calculateCommercialScore,
+  calculateFinalScore,
+  hasAutomaticVeto,
+  getDecision,
+  getDecisionText,
+  getEpmurasClassification,
+  getStrengths,
+  getWarnings
 } from "../../utils/calculations";
-import { AnimalEvaluation, AnswerLevel, BreedGroup, PurchaseObjective } from "../../types/checklist";
-import { AlertCircle, Printer, Save, CheckCircle2, XCircle } from "lucide-react";
+import { BreedGroup, PurchaseObjective } from "../../types/checklist";
+import {
+  AlertCircle,
+  Printer,
+  Save,
+  CheckCircle2,
+  XCircle,
+  Tag,
+  Target,
+  Activity,
+  Layers,
+  Filter,
+  ShieldAlert,
+  Award,
+  ArrowLeft,
+  ArrowRight,
+  Bookmark,
+  Calculator
+} from "lucide-react";
+
+const inputClass = "w-full p-2.5 border border-gray-300 rounded-lg bg-white text-brand-gray placeholder:text-gray-400 focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-colors shadow-sm";
+const labelClass = "text-sm font-semibold text-brand-dark-green";
+
+const stepIcons: Record<number, React.ReactNode> = {
+  1: <Tag className="h-6 w-6" />,
+  2: <Target className="h-6 w-6" />,
+  3: <Activity className="h-6 w-6" />,
+  4: <Layers className="h-6 w-6" />,
+  5: <Filter className="h-6 w-6" />,
+  6: <ShieldAlert className="h-6 w-6" />,
+  7: <Award className="h-6 w-6" />,
+};
 
 export default function AvaliarPage() {
   const router = useRouter();
@@ -37,6 +67,10 @@ export default function AvaliarPage() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [currentStep]);
 
   if (!mounted) return <div className="p-8 text-center">Carregando...</div>;
 
@@ -53,32 +87,32 @@ export default function AvaliarPage() {
     switch (currentStep) {
       case 1:
         return (
-          <StepLayout title="1. Identificação" subtitle="Dados básicos do animal">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <StepLayout title="1. Identificação" subtitle="Dados básicos do animal" icon={stepIcons[1]}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-brand-dark-green">Nome ou Brinco <span className="text-brand-red">*</span></label>
-                <input 
-                  type="text" 
-                  className="w-full p-2 border border-gray-300 rounded-md bg-white text-brand-gray focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-colors" 
+                <label className={labelClass}>Nome ou Brinco <span className="text-brand-red">*</span></label>
+                <input
+                  type="text"
+                  className={inputClass}
                   placeholder="Ex: Nelore 1024"
                   value={evaluation.animalName || ''}
                   onChange={e => updateField('animalName', e.target.value)}
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-brand-dark-green">Lote (opcional)</label>
-                <input 
-                  type="text" 
-                  className="w-full p-2 border border-gray-300 rounded-md bg-white text-brand-gray focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-colors" 
+                <label className={labelClass}>Lote (opcional)</label>
+                <input
+                  type="text"
+                  className={inputClass}
                   placeholder="Ex: Lote 5"
                   value={evaluation.lot || ''}
                   onChange={e => updateField('lot', e.target.value)}
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-brand-dark-green">Sexo <span className="text-brand-red">*</span></label>
-                <select 
-                  className="w-full p-2 border border-gray-300 rounded-md bg-white text-brand-gray focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-colors"
+                <label className={labelClass}>Sexo <span className="text-brand-red">*</span></label>
+                <select
+                  className={inputClass}
                   value={evaluation.sex}
                   onChange={e => updateField('sex', e.target.value as any)}
                 >
@@ -88,30 +122,30 @@ export default function AvaliarPage() {
                 </select>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-brand-dark-green">Idade Aproximada</label>
-                <input 
-                  type="text" 
-                  className="w-full p-2 border border-gray-300 rounded-md bg-white text-brand-gray focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-colors" 
+                <label className={labelClass}>Idade Aproximada</label>
+                <input
+                  type="text"
+                  className={inputClass}
                   placeholder="Ex: 24 meses"
                   value={evaluation.approximateAge || ''}
                   onChange={e => updateField('approximateAge', e.target.value)}
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-brand-dark-green">Peso Estimado</label>
-                <input 
-                  type="text" 
-                  className="w-full p-2 border border-gray-300 rounded-md bg-white text-brand-gray focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-colors" 
+                <label className={labelClass}>Peso Estimado</label>
+                <input
+                  type="text"
+                  className={inputClass}
                   placeholder="Ex: 450 kg"
                   value={evaluation.weight || ''}
                   onChange={e => updateField('weight', e.target.value)}
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-brand-dark-green">Preço / Condição</label>
-                <input 
-                  type="text" 
-                  className="w-full p-2 border border-gray-300 rounded-md bg-white text-brand-gray focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-colors" 
+                <label className={labelClass}>Preço / Condição</label>
+                <input
+                  type="text"
+                  className={inputClass}
                   placeholder="Ex: R$ 3.500"
                   value={evaluation.price || ''}
                   onChange={e => updateField('price', e.target.value)}
@@ -122,15 +156,15 @@ export default function AvaliarPage() {
         );
       case 2:
         return (
-          <StepLayout title="2. Raça e Objetivo" subtitle="Selecione para ajustar as orientações (Obrigatório)">
+          <StepLayout title="2. Raça e Objetivo" subtitle="Selecione para ajustar as orientações (Obrigatório)" icon={stepIcons[2]}>
             <div className="space-y-6">
               <div className="space-y-3">
-                <label className="text-sm font-semibold text-brand-dark-green">Grupo Racial</label>
+                <label className={labelClass}>Grupo Racial</label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                   {Object.entries(breedGroupsInfo).map(([key, info]) => (
-                    <Card 
-                      key={key} 
-                      hoverable 
+                    <Card
+                      key={key}
+                      hoverable
                       selected={evaluation.breedGroup === key}
                       onClick={() => updateField('breedGroup', key as BreedGroup)}
                       className={`p-3 text-sm text-center transition-colors ${evaluation.breedGroup === key ? 'text-brand-dark-green font-bold' : 'text-brand-gray font-medium'}`}
@@ -141,12 +175,12 @@ export default function AvaliarPage() {
                 </div>
               </div>
               <div className="space-y-3">
-                <label className="text-sm font-semibold text-brand-dark-green">Objetivo de Compra</label>
+                <label className={labelClass}>Objetivo de Compra</label>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {Object.entries(objectiveInfo).map(([key, info]) => (
-                    <Card 
-                      key={key} 
-                      hoverable 
+                    <Card
+                      key={key}
+                      hoverable
                       selected={evaluation.objective === key}
                       onClick={() => updateField('objective', key as PurchaseObjective)}
                       className={`p-3 text-sm text-center transition-colors ${evaluation.objective === key ? 'text-brand-dark-green font-bold' : 'text-brand-gray font-medium'}`}
@@ -165,11 +199,11 @@ export default function AvaliarPage() {
         // Steps 3, 4, 5 handle specific questions
         const isStep3 = currentStep === 3;
         const isStep4 = currentStep === 4;
-        
+
         let questionsToRender = [];
         let stepTitle = "";
         let stepSub = "";
-        
+
         if (isStep3) {
           questionsToRender = epmurasQuestions.slice(0, 3);
           stepTitle = "3. E, P, M";
@@ -185,7 +219,7 @@ export default function AvaliarPage() {
         }
 
         return (
-          <StepLayout title={stepTitle} subtitle={stepSub}>
+          <StepLayout title={stepTitle} subtitle={stepSub} icon={stepIcons[currentStep]}>
             <div className="space-y-4 mb-6">
               {(isStep3 || isStep4) && evaluation.breedGroup !== 'nao_informado' && (
                 <GuidanceCard title="Foco Racial" text={getBreedGuidance(evaluation.breedGroup)} />
@@ -195,24 +229,24 @@ export default function AvaliarPage() {
               )}
             </div>
 
-            <div className="space-y-8">
+            <div className="space-y-10">
               {questionsToRender.map((q) => {
                 const currentAnswer = evaluation.answers[q.key as keyof typeof evaluation.answers];
                 const isRacialCruzado = q.key === 'racial' && evaluation.breedGroup === 'cruzado_comercial';
-                
+
                 return (
                   <div key={q.key} className="space-y-3">
                     <h3 className="font-semibold text-lg text-brand-dark-green">
                       {isRacialCruzado ? "Uniformidade e tipo comercial" : q.question}
                     </h3>
                     {isRacialCruzado && (
-                      <p className="text-sm text-brand-brown mb-2 bg-brand-beige p-2 rounded">
+                      <p className="text-sm text-brand-brown mb-2 bg-brand-beige p-2.5 rounded-lg">
                         Para cruzados, não avalie pureza racial. Avalie padronização, tipo de carcaça, adaptação e aceitação comercial.
                       </p>
                     )}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       {(['bom', 'medio', 'ruim'] as const).map(level => (
-                        <AnswerCard 
+                        <AnswerCard
                           key={level}
                           title={level}
                           points={q.answers[level].points}
@@ -230,20 +264,20 @@ export default function AvaliarPage() {
         );
       case 6:
         return (
-          <StepLayout title="6. Vetos Automáticos" subtitle="Marque se o animal apresentar alguma condição crítica">
+          <StepLayout title="6. Vetos Automáticos" subtitle="Marque se o animal apresentar alguma condição crítica" icon={stepIcons[6]}>
             <GuidanceCard title="Atenção" text="Se qualquer veto for verdadeiro, a decisão final será 'Não comprar', independente da pontuação." />
-            
+
             <div className="space-y-3">
               {vetosList.map((veto) => (
-                <Card 
+                <Card
                   key={veto.key}
                   hoverable
                   onClick={() => updateVeto(veto.key as any, !evaluation.vetos[veto.key as keyof typeof evaluation.vetos])}
                   className={`p-4 flex items-start gap-3 transition-colors ${evaluation.vetos[veto.key as keyof typeof evaluation.vetos] ? 'bg-red-50 border-red-200' : 'bg-white'}`}
                 >
                   <div className="mt-0.5">
-                    <input 
-                      type="checkbox" 
+                    <input
+                      type="checkbox"
                       className="h-5 w-5 rounded text-brand-red focus:ring-brand-red cursor-pointer"
                       checked={evaluation.vetos[veto.key as keyof typeof evaluation.vetos]}
                       readOnly
@@ -265,7 +299,7 @@ export default function AvaliarPage() {
         const decision = getDecision(evaluation);
         const decisionText = getDecisionText(decision, hasVeto);
         const classification = getEpmurasClassification(epmurasScore);
-        
+
         const strengths = getStrengths(evaluation);
         const warnings = getWarnings(evaluation);
 
@@ -273,7 +307,7 @@ export default function AvaliarPage() {
         const allAnswered = Object.values(evaluation.answers).every(a => a !== 'nao_informado');
         if (!allAnswered) {
           return (
-            <StepLayout title="Resultado Final">
+            <StepLayout title="Resultado Final" icon={stepIcons[7]}>
               <Card className="p-8 text-center">
                 <AlertCircle className="h-12 w-12 text-brand-yellow mx-auto mb-4" />
                 <h3 className="text-xl font-bold text-brand-dark-green">Avaliação Incompleta</h3>
@@ -294,16 +328,16 @@ export default function AvaliarPage() {
         };
 
         return (
-          <StepLayout title="7. Resultado Final">
+          <StepLayout title="7. Resultado Final" icon={stepIcons[7]}>
             <div className="space-y-6">
-              
+
               {/* Main Decision Banner */}
               <div className={`rounded-xl border shadow-sm p-6 text-center ${decisionColors[decision]}`}>
-                <h2 className="text-3xl font-bold uppercase mb-2">
+                <h2 className="font-display text-3xl font-bold uppercase mb-2 tracking-wide">
                   {decision.replace(/_/g, ' ')}
                 </h2>
                 <p className="text-lg opacity-90">{decisionText}</p>
-                
+
                 {!hasVeto && (
                   <div className="mt-6 inline-block bg-black/20 rounded-full px-6 py-2">
                     <span className="text-4xl font-bold">{finalScore}</span>
@@ -357,7 +391,7 @@ export default function AvaliarPage() {
                     <p className="text-sm text-gray-400 italic">Nenhum ponto forte destacado.</p>
                   )}
                 </Card>
-                
+
                 <Card className="p-4">
                   <h4 className="font-bold text-brand-dark-green flex items-center gap-2 mb-3">
                     <AlertCircle className="h-5 w-5 text-brand-yellow" />
@@ -372,11 +406,14 @@ export default function AvaliarPage() {
                   )}
                 </Card>
               </div>
-              
+
               {/* Actions for Step 7 */}
-              <div className="flex flex-col sm:flex-row justify-center gap-4 pt-6 print:hidden">
+              <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-4 pt-6 print:hidden">
                 <Button size="lg" onClick={handleSaveAndExit}>
                   <Save className="mr-2 h-5 w-5" /> Salvar Avaliação
+                </Button>
+                <Button variant="secondary" size="lg" onClick={() => router.push('/bonus/calculadora')}>
+                  <Calculator className="mr-2 h-5 w-5" /> Calcular Preço Máximo
                 </Button>
                 <Button variant="outline" size="lg" onClick={handlePrint}>
                   <Printer className="mr-2 h-5 w-5" /> Imprimir / PDF
@@ -406,32 +443,42 @@ export default function AvaliarPage() {
   };
 
   return (
-    <div className="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 lg:p-8">
-      <EvaluationStepper currentStep={currentStep} totalSteps={7} />
-      
-      <div className="bg-white rounded-2xl shadow-sm border p-4 sm:p-6 lg:p-8 mb-8 print:border-none print:shadow-none print:p-0">
-        {renderStepContent()}
-      </div>
+    <div className="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 lg:p-8 page-wash">
+      <div className="flex gap-6 items-start">
+        <WizardSidebar currentStep={currentStep} totalSteps={7} onStepClick={setStep} />
 
-      {currentStep < 7 && (
-        <div className="flex justify-between items-center print:hidden border-t pt-4">
-          <Button 
-            variant="outline" 
-            onClick={currentStep === 1 ? () => router.push('/') : prevStep}
-          >
-            Voltar
-          </Button>
-          
-          <div className="flex gap-3">
-            <Button variant="ghost" onClick={handleSaveAndExit} className="hidden sm:inline-flex">
-              Salvar Rascunho
-            </Button>
-            <Button onClick={nextStep} disabled={!canProceed()}>
-              Próximo
-            </Button>
+        <div className="flex-1 min-w-0">
+          <EvaluationStepper currentStep={currentStep} totalSteps={7} />
+
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6 lg:p-8 mb-6 print:border-none print:shadow-none print:p-0">
+            {renderStepContent()}
           </div>
+
+          {currentStep < 7 && (
+            <div className="flex justify-between items-center print:hidden">
+              <Button
+                variant="outline"
+                className="bg-white"
+                onClick={currentStep === 1 ? () => router.push('/') : prevStep}
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Voltar
+              </Button>
+
+              <div className="flex gap-3">
+                <Button variant="outline" onClick={handleSaveAndExit} className="hidden sm:inline-flex bg-white">
+                  <Bookmark className="mr-2 h-4 w-4" />
+                  Salvar Rascunho
+                </Button>
+                <Button onClick={nextStep} disabled={!canProceed()} className="shadow-md shadow-brand-dark-green/20">
+                  Próximo
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }

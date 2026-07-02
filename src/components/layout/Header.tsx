@@ -1,34 +1,72 @@
-import React from 'react';
+"use client";
+
 import Link from 'next/link';
-import { ClipboardList, History, Home } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { ClipboardList, History, Home, Gift } from 'lucide-react';
+
+const navItems = [
+  { href: '/', label: 'Início', icon: Home },
+  { href: '/avaliar', label: 'Nova Avaliação', icon: ClipboardList },
+  { href: '/bonus', label: 'Bônus', icon: Gift, badge: 'Hoje!' },
+  { href: '/historico', label: 'Histórico', icon: History },
+];
 
 export const Header = () => {
+  const pathname = usePathname();
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 print:hidden">
+    <header className="sticky top-0 z-50 w-full border-b border-brand-dark-green/10 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 print:hidden">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center space-x-2">
-          <div className="bg-brand-dark-green text-brand-beige p-1.5 rounded-md">
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="bg-brand-dark-green text-brand-beige p-2 rounded-lg ring-1 ring-brand-gold/40 shadow-sm group-hover:bg-brand-deep-green transition-colors">
             <ClipboardList className="h-5 w-5" />
           </div>
-          <span className="font-bold text-brand-dark-green hidden sm:inline-block">
-            Checklist EPMURAS
+          <div className="leading-tight">
+            <span className="block font-bold text-brand-dark-green tracking-tight">
+              Checklist EPMURAS
+            </span>
+            <span className="block text-[11px] font-semibold text-brand-gold uppercase tracking-wider">
+              Compra de Gado
+            </span>
+          </div>
+        </Link>
+
+        <nav className="hidden lg:flex items-center gap-1 text-sm font-medium">
+          {navItems.map(({ href, label, icon: Icon, badge }) => {
+            const active = href === '/bonus' ? pathname.startsWith('/bonus') : pathname === href;
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={`relative flex items-center gap-1.5 px-3 py-2 rounded-full transition-colors ${
+                  active
+                    ? 'bg-brand-dark-green/10 text-brand-dark-green font-semibold'
+                    : 'text-brand-gray hover:text-brand-dark-green hover:bg-brand-beige'
+                }`}
+              >
+                <Icon className="h-4 w-4" />
+                <span>{label}</span>
+                {badge && (
+                  <span className="absolute -top-1 -right-1 rounded-full bg-brand-gold text-white text-[9px] font-bold px-1.5 py-px leading-tight shadow-sm">
+                    {badge}
+                  </span>
+                )}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Mobile: quick access to bonus hub; bottom nav handles the rest */}
+        <Link
+          href="/bonus"
+          className="lg:hidden relative flex items-center justify-center h-9 w-9 rounded-full bg-brand-beige text-brand-dark-green"
+          aria-label="Bônus de hoje"
+        >
+          <Gift className="h-4.5 w-4.5" />
+          <span className="absolute -top-1 -right-1.5 rounded-full bg-brand-gold text-white text-[8px] font-bold px-1 py-px leading-tight shadow-sm">
+            Hoje!
           </span>
         </Link>
-        
-        <nav className="flex items-center space-x-4 text-sm font-medium">
-          <Link href="/" className="text-brand-gray hover:text-brand-dark-green transition-colors flex items-center gap-1">
-            <Home className="h-4 w-4" />
-            <span className="hidden sm:inline">Início</span>
-          </Link>
-          <Link href="/avaliar" className="text-brand-gray hover:text-brand-dark-green transition-colors flex items-center gap-1">
-            <ClipboardList className="h-4 w-4" />
-            <span className="hidden sm:inline">Nova Avaliação</span>
-          </Link>
-          <Link href="/historico" className="text-brand-gray hover:text-brand-dark-green transition-colors flex items-center gap-1">
-            <History className="h-4 w-4" />
-            <span className="hidden sm:inline">Histórico</span>
-          </Link>
-        </nav>
       </div>
     </header>
   );
