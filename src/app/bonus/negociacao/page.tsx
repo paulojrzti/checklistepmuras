@@ -114,14 +114,24 @@ function NegociacaoContent() {
         <div className="space-y-5">
           {/* Animal header */}
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 flex flex-wrap items-center gap-4 justify-between">
-            <div>
-              <h2 className="font-display text-xl font-bold text-brand-dark-green">
-                {selected.animalName || "Animal sem identificação"}
-              </h2>
-              <p className="text-xs font-semibold text-brand-gray/80 uppercase tracking-wide mt-1">
-                {selected.breedGroup.replace(/_/g, ' ')} • {selected.objective.replace(/_/g, ' ')}
-                {selected.weight ? ` • ${displayKg(selected.weight)}` : ''}
-              </p>
+            <div className="flex items-center gap-3 min-w-0">
+              {selected.photo && (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={selected.photo}
+                  alt={`Foto de ${selected.animalName || 'animal'}`}
+                  className="shrink-0 h-14 w-14 rounded-full object-cover ring-2 ring-brand-dark-green/20"
+                />
+              )}
+              <div className="min-w-0">
+                <h2 className="font-display text-xl font-bold text-brand-dark-green truncate">
+                  {selected.animalName || "Animal sem identificação"}
+                </h2>
+                <p className="text-xs font-semibold text-brand-gray/80 uppercase tracking-wide mt-1">
+                  {selected.breedGroup.replace(/_/g, ' ')} • {selected.objective.replace(/_/g, ' ')}
+                  {selected.weight ? ` • ${displayKg(selected.weight)}` : ''}
+                </p>
+              </div>
             </div>
             <div className="flex items-center gap-4">
               <span className={`inline-block text-[11px] font-bold uppercase tracking-wide px-3 py-1 rounded-full border ${decisionBadges[decision].classes}`}>

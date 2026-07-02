@@ -6,33 +6,20 @@ import { useEvaluationStore } from "../../store/useEvaluationStore";
 import { useHistoryStore } from "../../store/useHistoryStore";
 import { Button } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Card";
-import { Badge } from "../../components/ui/Badge";
 import { MaskedNumberInput } from "../../components/ui/MaskedNumberInput";
 import { StepLayout, EvaluationStepper, WizardSidebar, AnswerCard, GuidanceCard } from "../../components/wizard/WizardComponents";
+import { PhotoField } from "../../components/wizard/PhotoField";
+import { ResultView } from "../../components/result/ResultView";
 import { epmurasQuestions, commercialQuestions } from "../../data/questions";
 import { breedGroupsInfo } from "../../data/breeds";
 import { objectiveInfo } from "../../data/objectives";
 import { vetosList } from "../../data/vetos";
-import {
-  getBreedGuidance,
-  getObjectiveGuidance,
-  calculateEpmurasScore,
-  calculateCommercialScore,
-  calculateFinalScore,
-  hasAutomaticVeto,
-  getDecision,
-  getDecisionText,
-  getEpmurasClassification,
-  getStrengths,
-  getWarnings
-} from "../../utils/calculations";
+import { getBreedGuidance, getObjectiveGuidance } from "../../utils/calculations";
 import { BreedGroup, PurchaseObjective } from "../../types/checklist";
 import {
   AlertCircle,
   Printer,
   Save,
-  CheckCircle2,
-  XCircle,
   Tag,
   Target,
   Activity,
@@ -147,6 +134,13 @@ export default function AvaliarPage() {
                   placeholder="Ex: 3.500"
                   value={evaluation.price || ''}
                   onChange={v => updateField('price', v)}
+                />
+              </div>
+              <div className="space-y-2 md:col-span-2">
+                <label className={labelClass}>Foto do Animal</label>
+                <PhotoField
+                  value={evaluation.photo}
+                  onChange={photo => updateField('photo', photo)}
                 />
               </div>
             </div>
@@ -290,17 +284,6 @@ export default function AvaliarPage() {
           </StepLayout>
         );
       case 7:
-        const epmurasScore = calculateEpmurasScore(evaluation);
-        const commercialScore = calculateCommercialScore(evaluation);
-        const finalScore = calculateFinalScore(evaluation);
-        const hasVeto = hasAutomaticVeto(evaluation);
-        const decision = getDecision(evaluation);
-        const decisionText = getDecisionText(decision, hasVeto);
-        const classification = getEpmurasClassification(epmurasScore);
-
-        const strengths = getStrengths(evaluation);
-        const warnings = getWarnings(evaluation);
-
         // Check if all answered
         const allAnswered = Object.values(evaluation.answers).every(a => a !== 'nao_informado');
         if (!allAnswered) {
@@ -318,92 +301,10 @@ export default function AvaliarPage() {
           );
         }
 
-        const decisionColors = {
-          boa_compra: "bg-brand-green text-white",
-          comprar_com_cautela: "bg-brand-yellow text-white",
-          comprar_com_desconto: "bg-brand-brown text-white",
-          nao_comprar: "bg-brand-red text-white",
-        };
-
         return (
           <StepLayout title="7. Resultado Final" icon={stepIcons[7]}>
             <div className="space-y-6">
-
-              {/* Main Decision Banner */}
-              <div className={`rounded-xl border shadow-sm p-6 text-center ${decisionColors[decision]}`}>
-                <h2 className="font-display text-3xl font-bold uppercase mb-2 tracking-wide">
-                  {decision.replace(/_/g, ' ')}
-                </h2>
-                <p className="text-lg opacity-90">{decisionText}</p>
-
-                {!hasVeto && (
-                  <div className="mt-6 inline-block bg-black/20 rounded-full px-6 py-2">
-                    <span className="text-4xl font-bold">{finalScore}</span>
-                    <span className="text-xl opacity-80">/50</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Breakdowns */}
-              {!hasVeto && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Card className="p-4 text-center">
-                    <p className="text-sm text-brand-gray uppercase tracking-wider font-semibold">Subtotal EPMURAS</p>
-                    <p className="text-3xl font-bold text-brand-dark-green my-1">{epmurasScore}<span className="text-lg text-gray-400 font-normal">/34</span></p>
-                    <Badge variant={epmurasScore >= 25 ? 'success' : epmurasScore >= 20 ? 'warning' : 'danger'}>{classification}</Badge>
-                  </Card>
-                  <Card className="p-4 text-center">
-                    <p className="text-sm text-brand-gray uppercase tracking-wider font-semibold">Subtotal Comercial</p>
-                    <p className="text-3xl font-bold text-brand-dark-green my-1">{commercialScore}<span className="text-lg text-gray-400 font-normal">/16</span></p>
-                  </Card>
-                </div>
-              )}
-
-              {/* Vetos List */}
-              {hasVeto && (
-                <div className="rounded-xl shadow-sm p-4 border border-brand-red bg-red-50">
-                  <h4 className="font-bold text-brand-red flex items-center gap-2 mb-2">
-                    <XCircle className="h-5 w-5" />
-                    Vetos Identificados
-                  </h4>
-                  <ul className="list-disc list-inside text-sm text-red-800 space-y-1">
-                    {vetosList.filter(v => evaluation.vetos[v.key as keyof typeof evaluation.vetos]).map(v => (
-                      <li key={v.key}>{v.text}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Strengths & Warnings */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-2">
-                <Card className="p-4">
-                  <h4 className="font-bold text-brand-dark-green flex items-center gap-2 mb-3">
-                    <CheckCircle2 className="h-5 w-5 text-brand-green" />
-                    Pontos Fortes
-                  </h4>
-                  {strengths.length > 0 ? (
-                    <ul className="space-y-2 text-sm text-brand-gray">
-                      {strengths.map((s, i) => <li key={i} className="flex items-start gap-2"><span className="text-brand-green mt-0.5">•</span>{s}</li>)}
-                    </ul>
-                  ) : (
-                    <p className="text-sm text-gray-400 italic">Nenhum ponto forte destacado.</p>
-                  )}
-                </Card>
-
-                <Card className="p-4">
-                  <h4 className="font-bold text-brand-dark-green flex items-center gap-2 mb-3">
-                    <AlertCircle className="h-5 w-5 text-brand-yellow" />
-                    Pontos de Atenção
-                  </h4>
-                  {warnings.length > 0 ? (
-                    <ul className="space-y-2 text-sm text-brand-gray">
-                      {warnings.map((w, i) => <li key={i} className="flex items-start gap-2"><span className="text-brand-yellow mt-0.5">•</span>{w}</li>)}
-                    </ul>
-                  ) : (
-                    <p className="text-sm text-gray-400 italic">Nenhum ponto crítico de atenção.</p>
-                  )}
-                </Card>
-              </div>
+              <ResultView evaluation={evaluation} />
 
               {/* Actions for Step 7 */}
               <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-4 pt-6 print:hidden">
@@ -420,7 +321,6 @@ export default function AvaliarPage() {
                   Nova Avaliação
                 </Button>
               </div>
-
             </div>
           </StepLayout>
         );

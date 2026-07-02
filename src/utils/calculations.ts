@@ -95,6 +95,52 @@ export const getEpmurasClassification = (score: number): string => {
   return "Inferior";
 };
 
+export type ScoreBreakdownItem = {
+  key: string;
+  label: string;
+  group: "epmuras" | "comercial";
+  level: AnswerLevel;
+  points: number;
+  max: number;
+};
+
+const breakdownLabels: Record<string, string> = {
+  estrutura: "Estrutura",
+  precocidade: "Precocidade",
+  musculosidade: "Musculosidade",
+  umbigo: "Umbigo",
+  racial: "Racial",
+  aprumos: "Aprumos",
+  sexualidade: "Sexualidade",
+  sanidade: "Sanidade",
+  idadePesoObjetivo: "Idade/Peso",
+  temperamento: "Temperamento",
+  procedencia: "Procedência",
+  precoMargem: "Preço/Margem",
+};
+
+/**
+ * Pontuação bruta por característica (para gráficos). O máximo de cada item
+ * é a pontuação da resposta "bom". Obs.: o total oficial usa o ajuste de
+ * estrutura funcional, então pode diferir ±1 do somatório destes itens.
+ */
+export const getScoreBreakdown = (evaluation: AnimalEvaluation): ScoreBreakdownItem[] => {
+  const build = (questions: typeof epmurasQuestions, group: "epmuras" | "comercial") =>
+    questions.map((q) => {
+      const level = evaluation.answers[q.key as keyof typeof evaluation.answers];
+      return {
+        key: q.key,
+        label: breakdownLabels[q.key] ?? q.key,
+        group,
+        level,
+        points: level === "nao_informado" ? 0 : q.answers[level].points,
+        max: q.answers.bom.points,
+      };
+    });
+
+  return [...build(epmurasQuestions, "epmuras"), ...build(commercialQuestions, "comercial")];
+};
+
 export const getBreedGuidance = (breedGroup: BreedGroup): string => {
   return breedGroupsInfo[breedGroup]?.guidance || breedGroupsInfo.nao_informado.guidance;
 };

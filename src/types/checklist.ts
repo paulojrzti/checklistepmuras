@@ -29,6 +29,8 @@ export type AnimalEvaluation = {
 
   animalName?: string;
   lot?: string;
+  /** Foto do animal como data URL JPEG comprimida (~700px). */
+  photo?: string;
   breedGroup: BreedGroup;
   sex: "macho" | "femea" | "nao_informado";
   approximateAge?: string;

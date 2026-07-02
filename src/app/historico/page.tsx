@@ -32,7 +32,8 @@ import {
   calculateCommercialScore,
   calculateFinalScore,
 } from "../../utils/calculations";
-import { displayKg, displayBRL, displayMeses } from "../../utils/pricing";
+import { displayKg, displayBRL } from "../../utils/pricing";
+import { ResultView, ScoreRing } from "../../components/result/ResultView";
 import { AnimalEvaluation, Decision } from "../../types/checklist";
 
 const decisionStyles: Record<Decision, { label: string; badge: string; score: string; ring: string }> = {
@@ -66,27 +67,6 @@ const sexLabel: Record<string, string> = {
   macho: "Macho",
   femea: "Fêmea",
   nao_informado: "N/A",
-};
-
-const ScoreRing = ({ score, max, color }: { score: number; max: number; color: string }) => {
-  const radius = 20;
-  const circumference = 2 * Math.PI * radius;
-  const filled = Math.max(0, Math.min(1, score / max)) * circumference;
-  return (
-    <svg width="52" height="52" viewBox="0 0 52 52" className="shrink-0 -rotate-90" aria-hidden="true">
-      <circle cx="26" cy="26" r={radius} fill="none" stroke="#E5E7EB" strokeWidth="6" />
-      <circle
-        cx="26"
-        cy="26"
-        r={radius}
-        fill="none"
-        stroke={color}
-        strokeWidth="6"
-        strokeLinecap="round"
-        strokeDasharray={`${filled} ${circumference - filled}`}
-      />
-    </svg>
-  );
 };
 
 type SortOption = "recentes" | "antigas" | "maior_nota" | "menor_nota";
@@ -261,9 +241,18 @@ export default function HistoricoPage() {
                   <div className="p-4 sm:p-5 flex flex-col md:flex-row gap-4 md:items-center">
                     {/* Identity */}
                     <div className="flex items-start gap-4 flex-1 min-w-0">
-                      <div className="shrink-0 flex h-12 w-12 items-center justify-center rounded-full bg-brand-dark-green text-brand-beige font-display text-xl font-bold">
-                        {initial}
-                      </div>
+                      {evalItem.photo ? (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img
+                          src={evalItem.photo}
+                          alt={`Foto de ${evalItem.animalName || 'animal'}`}
+                          className="shrink-0 h-12 w-12 rounded-full object-cover ring-2 ring-brand-dark-green/20"
+                        />
+                      ) : (
+                        <div className="shrink-0 flex h-12 w-12 items-center justify-center rounded-full bg-brand-dark-green text-brand-beige font-display text-xl font-bold">
+                          {initial}
+                        </div>
+                      )}
                       <div className="min-w-0">
                         <h3 className="font-bold text-lg text-brand-dark-green truncate">
                           {evalItem.animalName || "Animal sem identificação"}
@@ -332,13 +321,13 @@ export default function HistoricoPage() {
                   </div>
 
                   {expanded && (
-                    <div className="px-4 sm:px-6 pb-6 pt-2 border-t border-gray-200 bg-brand-cream/60 text-sm">
-                      <div className="mt-4 p-3 bg-white rounded-lg border border-gray-200">
+                    <div className="px-4 sm:px-6 pb-6 pt-4 border-t border-gray-200 bg-brand-cream/60 text-sm space-y-4">
+                      <div className="p-3 bg-white rounded-lg border border-gray-200">
                         <p className="font-semibold text-brand-dark-green mb-1">Decisão Final:</p>
                         <p className="text-brand-gray">{decisionText}</p>
                       </div>
 
-                      <div className="flex flex-wrap gap-2 mt-4">
+                      <div className="flex flex-wrap gap-2">
                         <Link
                           href={`/bonus/calculadora?avaliacao=${evalItem.id}`}
                           className="inline-flex items-center gap-1.5 rounded-lg bg-brand-dark-green text-white px-3 py-2 text-xs font-semibold hover:bg-brand-deep-green transition-colors"
@@ -355,29 +344,7 @@ export default function HistoricoPage() {
                         </Link>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                        <div>
-                          <p className="font-semibold text-brand-dark-green mb-2">Dados Básicos</p>
-                          <ul className="space-y-1 text-brand-gray">
-                            <li><strong>Sexo:</strong> {sexLabel[evalItem.sex] ?? evalItem.sex}</li>
-                            <li><strong>Idade:</strong> {displayMeses(evalItem.approximateAge)}</li>
-                            <li><strong>Peso:</strong> {displayKg(evalItem.weight)}</li>
-                            <li><strong>Preço:</strong> {displayBRL(evalItem.price)}</li>
-                          </ul>
-                        </div>
-                        <div>
-                          <p className="font-semibold text-brand-dark-green mb-2">Resumo de Respostas (EPMURAS)</p>
-                          <ul className="space-y-1 text-brand-gray grid grid-cols-2 gap-x-2">
-                            <li>E: {evalItem.answers.estrutura}</li>
-                            <li>P: {evalItem.answers.precocidade}</li>
-                            <li>M: {evalItem.answers.musculosidade}</li>
-                            <li>U: {evalItem.answers.umbigo}</li>
-                            <li>R: {evalItem.answers.racial}</li>
-                            <li>A: {evalItem.answers.aprumos}</li>
-                            <li>S: {evalItem.answers.sexualidade}</li>
-                          </ul>
-                        </div>
-                      </div>
+                      <ResultView evaluation={evalItem} compact />
                     </div>
                   )}
                 </Card>
