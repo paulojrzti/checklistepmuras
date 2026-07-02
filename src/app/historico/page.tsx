@@ -32,6 +32,7 @@ import {
   calculateCommercialScore,
   calculateFinalScore,
 } from "../../utils/calculations";
+import { displayKg, displayBRL, displayMeses } from "../../utils/pricing";
 import { AnimalEvaluation, Decision } from "../../types/checklist";
 
 const decisionStyles: Record<Decision, { label: string; badge: string; score: string; ring: string }> = {
@@ -273,8 +274,8 @@ export default function HistoricoPage() {
                         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-brand-gray/80 mt-2">
                           <span className="inline-flex items-center gap-1"><Calendar className="h-3.5 w-3.5" />{date}</span>
                           <span>{sexLabel[evalItem.sex] ?? evalItem.sex}</span>
-                          {evalItem.weight && <span className="inline-flex items-center gap-1"><Scale className="h-3.5 w-3.5" />{evalItem.weight}</span>}
-                          {evalItem.price && <span className="inline-flex items-center gap-1"><Tag className="h-3.5 w-3.5" />{evalItem.price}</span>}
+                          {evalItem.weight && <span className="inline-flex items-center gap-1"><Scale className="h-3.5 w-3.5" />{displayKg(evalItem.weight)}</span>}
+                          {evalItem.price && <span className="inline-flex items-center gap-1"><Tag className="h-3.5 w-3.5" />{displayBRL(evalItem.price)}</span>}
                           {evalItem.lot && <span className="inline-flex items-center gap-1">Lote: {evalItem.lot}</span>}
                         </div>
                       </div>
@@ -359,9 +360,9 @@ export default function HistoricoPage() {
                           <p className="font-semibold text-brand-dark-green mb-2">Dados Básicos</p>
                           <ul className="space-y-1 text-brand-gray">
                             <li><strong>Sexo:</strong> {sexLabel[evalItem.sex] ?? evalItem.sex}</li>
-                            <li><strong>Idade:</strong> {evalItem.approximateAge || 'N/A'}</li>
-                            <li><strong>Peso:</strong> {evalItem.weight || 'N/A'}</li>
-                            <li><strong>Preço:</strong> {evalItem.price || 'N/A'}</li>
+                            <li><strong>Idade:</strong> {displayMeses(evalItem.approximateAge)}</li>
+                            <li><strong>Peso:</strong> {displayKg(evalItem.weight)}</li>
+                            <li><strong>Preço:</strong> {displayBRL(evalItem.price)}</li>
                           </ul>
                         </div>
                         <div>

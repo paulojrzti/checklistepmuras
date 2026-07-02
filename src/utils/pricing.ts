@@ -35,6 +35,25 @@ export const parseNumberBR = (s?: string): number | null => {
 export const formatBRL = (n: number): string =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }).format(n);
 
+/**
+ * Normalizam a exibição de campos livres antigos ("450 kg", "R$ 3.500")
+ * e novos mascarados ("450", "3.500") para um formato único.
+ */
+export const displayKg = (s?: string): string => {
+  const n = parseNumberBR(s);
+  return n !== null ? `${n.toLocaleString("pt-BR")} kg` : (s || "N/A");
+};
+
+export const displayBRL = (s?: string): string => {
+  const n = parseNumberBR(s);
+  return n !== null ? formatBRL(n) : (s || "N/A");
+};
+
+export const displayMeses = (s?: string): string => {
+  const n = parseNumberBR(s);
+  return n !== null ? `${n.toLocaleString("pt-BR")} meses` : (s || "N/A");
+};
+
 export type DiscountReason = { label: string; percent: number };
 
 export type TechnicalDiscount = {

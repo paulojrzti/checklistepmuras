@@ -12,6 +12,7 @@ import {
   UserCheck,
 } from "lucide-react";
 import { BonusBadge, VideoEmbed } from "../../../components/bonus/BonusComponents";
+import { MaskedNumberInput } from "../../../components/ui/MaskedNumberInput";
 import { parseNumberBR, formatBRL } from "../../../utils/pricing";
 
 const fieldClass = "w-full p-2.5 border border-gray-300 rounded-lg bg-white text-brand-gray placeholder:text-gray-400 focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-colors shadow-sm";
@@ -88,12 +89,12 @@ export default function ConsultorPage() {
   }, [modelo, quantidade, valorBase]);
 
   const baseLabel = modelo === "percentual"
-    ? "Valor total da negociação (R$)"
+    ? "Valor total da negociação"
     : modelo === "por_dia"
-      ? "Valor da sua diária (R$)"
+      ? "Valor da sua diária"
       : modelo === "laudo"
-        ? "Valor por laudo (R$)"
-        : "Valor por cabeça (R$)";
+        ? "Valor por laudo"
+        : "Valor por cabeça";
 
   const qtdLabel = modelo === "laudo" ? "Número de laudos" : "Número de animais";
 
@@ -179,17 +180,15 @@ export default function ConsultorPage() {
           </div>
           <div className="space-y-2">
             <label className={labelClass}>{qtdLabel}</label>
-            <input type="text" inputMode="numeric" className={fieldClass} value={quantidade} onChange={e => setQuantidade(e.target.value)} />
+            <MaskedNumberInput value={quantidade} onChange={setQuantidade} />
           </div>
           <div className="space-y-2">
             <label className={labelClass}>{baseLabel}</label>
-            <input
-              type="text"
-              inputMode="decimal"
-              className={fieldClass}
+            <MaskedNumberInput
+              prefix="R$"
               placeholder={modelo === "percentual" ? "Ex: 150.000" : "Opcional — usa referência"}
               value={valorBase}
-              onChange={e => setValorBase(e.target.value)}
+              onChange={setValorBase}
             />
           </div>
         </div>

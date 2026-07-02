@@ -15,6 +15,7 @@ import {
 import { useHistoryStore } from "../../../store/useHistoryStore";
 import { useEvaluationStore } from "../../../store/useEvaluationStore";
 import { BonusBadge } from "../../../components/bonus/BonusComponents";
+import { MaskedNumberInput, numberToMaskedString } from "../../../components/ui/MaskedNumberInput";
 import { parseNumberBR, formatBRL, getTechnicalDiscount, computeMaxPrice, TechnicalDiscount } from "../../../utils/pricing";
 import { calculateFinalScore } from "../../../utils/calculations";
 import { AnimalEvaluation } from "../../../types/checklist";
@@ -50,9 +51,9 @@ function CalculadoraContent() {
     const pedidoNum = parseNumberBR(evalItem.price);
     const technical = getTechnicalDiscount(evalItem);
 
-    if (pesoNum) setPeso(String(pesoNum));
-    if (pedidoNum) setPrecoPedido(String(pedidoNum));
-    setDesconto(String(technical.percent));
+    if (pesoNum) setPeso(numberToMaskedString(pesoNum, 0));
+    if (pedidoNum) setPrecoPedido(numberToMaskedString(pedidoNum, 0));
+    setDesconto(numberToMaskedString(technical.percent, 2));
     setDiscountInfo(technical);
   };
 
@@ -149,13 +150,13 @@ function CalculadoraContent() {
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 sm:p-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div className="space-y-2">
-            <label className={labelClass}>Peso vivo (kg) <span className="text-brand-red">*</span></label>
-            <input type="text" inputMode="decimal" className={fieldClass} placeholder="Ex: 450" value={peso} onChange={e => setPeso(e.target.value)} />
+            <label className={labelClass}>Peso vivo <span className="text-brand-red">*</span></label>
+            <MaskedNumberInput suffix="kg" placeholder="Ex: 450" value={peso} onChange={setPeso} />
           </div>
           <div className="space-y-2">
-            <label className={labelClass}>Rendimento de carcaça (%) <span className="text-brand-red">*</span></label>
+            <label className={labelClass}>Rendimento de carcaça <span className="text-brand-red">*</span></label>
             <div className="flex gap-2">
-              <input type="text" inputMode="decimal" className={fieldClass} placeholder="Ex: 52" value={rendimento} onChange={e => setRendimento(e.target.value)} />
+              <MaskedNumberInput suffix="%" decimals={1} max={100} placeholder="Ex: 52" value={rendimento} onChange={setRendimento} />
               <div className="flex gap-1">
                 {["50", "52", "54"].map(p => (
                   <button
@@ -173,12 +174,12 @@ function CalculadoraContent() {
             </div>
           </div>
           <div className="space-y-2">
-            <label className={labelClass}>Preço da arroba (R$) <span className="text-brand-red">*</span></label>
-            <input type="text" inputMode="decimal" className={fieldClass} placeholder="Ex: 240" value={precoArroba} onChange={e => setPrecoArroba(e.target.value)} />
+            <label className={labelClass}>Preço da arroba <span className="text-brand-red">*</span></label>
+            <MaskedNumberInput prefix="R$" decimals={2} placeholder="Ex: 240" value={precoArroba} onChange={setPrecoArroba} />
           </div>
           <div className="space-y-2">
-            <label className={labelClass}>Desconto técnico (%)</label>
-            <input type="text" inputMode="decimal" className={fieldClass} placeholder="Ex: 6" value={desconto} onChange={e => setDesconto(e.target.value)} />
+            <label className={labelClass}>Desconto técnico</label>
+            <MaskedNumberInput suffix="%" decimals={2} max={100} placeholder="Ex: 6" value={desconto} onChange={setDesconto} />
             {discountInfo && discountInfo.reasons.length > 0 && (
               <button
                 type="button"
@@ -191,12 +192,12 @@ function CalculadoraContent() {
             )}
           </div>
           <div className="space-y-2">
-            <label className={labelClass}>Margem de segurança desejada (%)</label>
-            <input type="text" inputMode="decimal" className={fieldClass} placeholder="Ex: 5" value={margem} onChange={e => setMargem(e.target.value)} />
+            <label className={labelClass}>Margem de segurança desejada</label>
+            <MaskedNumberInput suffix="%" decimals={1} max={100} placeholder="Ex: 5" value={margem} onChange={setMargem} />
           </div>
           <div className="space-y-2">
-            <label className={labelClass}>Preço pedido pelo vendedor (R$)</label>
-            <input type="text" inputMode="decimal" className={fieldClass} placeholder="Opcional — Ex: 3.500" value={precoPedido} onChange={e => setPrecoPedido(e.target.value)} />
+            <label className={labelClass}>Preço pedido pelo vendedor</label>
+            <MaskedNumberInput prefix="R$" placeholder="Opcional — Ex: 3.500" value={precoPedido} onChange={setPrecoPedido} />
           </div>
         </div>
 

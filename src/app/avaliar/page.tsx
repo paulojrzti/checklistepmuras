@@ -7,6 +7,7 @@ import { useHistoryStore } from "../../store/useHistoryStore";
 import { Button } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Card";
 import { Badge } from "../../components/ui/Badge";
+import { MaskedNumberInput } from "../../components/ui/MaskedNumberInput";
 import { StepLayout, EvaluationStepper, WizardSidebar, AnswerCard, GuidanceCard } from "../../components/wizard/WizardComponents";
 import { epmurasQuestions, commercialQuestions } from "../../data/questions";
 import { breedGroupsInfo } from "../../data/breeds";
@@ -123,32 +124,29 @@ export default function AvaliarPage() {
               </div>
               <div className="space-y-2">
                 <label className={labelClass}>Idade Aproximada</label>
-                <input
-                  type="text"
-                  className={inputClass}
-                  placeholder="Ex: 24 meses"
+                <MaskedNumberInput
+                  suffix="meses"
+                  placeholder="Ex: 24"
                   value={evaluation.approximateAge || ''}
-                  onChange={e => updateField('approximateAge', e.target.value)}
+                  onChange={v => updateField('approximateAge', v)}
                 />
               </div>
               <div className="space-y-2">
                 <label className={labelClass}>Peso Estimado</label>
-                <input
-                  type="text"
-                  className={inputClass}
-                  placeholder="Ex: 450 kg"
+                <MaskedNumberInput
+                  suffix="kg"
+                  placeholder="Ex: 450"
                   value={evaluation.weight || ''}
-                  onChange={e => updateField('weight', e.target.value)}
+                  onChange={v => updateField('weight', v)}
                 />
               </div>
               <div className="space-y-2">
-                <label className={labelClass}>Preço / Condição</label>
-                <input
-                  type="text"
-                  className={inputClass}
-                  placeholder="Ex: R$ 3.500"
+                <label className={labelClass}>Preço</label>
+                <MaskedNumberInput
+                  prefix="R$"
+                  placeholder="Ex: 3.500"
                   value={evaluation.price || ''}
-                  onChange={e => updateField('price', e.target.value)}
+                  onChange={v => updateField('price', v)}
                 />
               </div>
             </div>

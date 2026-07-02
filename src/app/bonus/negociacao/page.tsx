@@ -15,7 +15,7 @@ import {
 import { useHistoryStore } from "../../../store/useHistoryStore";
 import { BonusBadge } from "../../../components/bonus/BonusComponents";
 import { answerArguments, vetoArguments, negotiationScript, anchorPhrases, NegotiationArgument } from "../../../data/negotiation";
-import { getTechnicalDiscount, parseNumberBR, formatBRL } from "../../../utils/pricing";
+import { getTechnicalDiscount, parseNumberBR, formatBRL, displayKg } from "../../../utils/pricing";
 import { calculateFinalScore, getDecision, getStrengths } from "../../../utils/calculations";
 import { AnimalEvaluation, Decision } from "../../../types/checklist";
 
@@ -120,7 +120,7 @@ function NegociacaoContent() {
               </h2>
               <p className="text-xs font-semibold text-brand-gray/80 uppercase tracking-wide mt-1">
                 {selected.breedGroup.replace(/_/g, ' ')} • {selected.objective.replace(/_/g, ' ')}
-                {selected.weight ? ` • ${selected.weight}` : ''}
+                {selected.weight ? ` • ${displayKg(selected.weight)}` : ''}
               </p>
             </div>
             <div className="flex items-center gap-4">
