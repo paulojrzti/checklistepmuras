@@ -1,26 +1,31 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Download, X, Share } from "lucide-react";
+import { Download, X, Share, MoreVertical } from "lucide-react";
 import { useAuth } from "../auth/AuthProvider";
-
-type BeforeInstallPromptEvent = Event & {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
-};
+import { useInstall } from "./useInstall";
 
 const DISMISS_KEY = "epmuras-install-dismissed";
 
-const isStandalone = () =>
-  window.matchMedia("(display-mode: standalone)").matches ||
-  // iOS Safari
-  (navigator as unknown as { standalone?: boolean }).standalone === true;
+export const InstallHelp = ({ ios }: { ios: boolean }) => (
+  ios ? (
+    <p className="text-xs text-white/80 mt-0.5">
+      Toque em <Share className="inline h-3.5 w-3.5 mx-0.5 -mt-0.5" aria-label="Compartilhar" /> (Compartilhar)
+      e depois em <strong>“Adicionar à Tela de Início”</strong>.
+    </p>
+  ) : (
+    <p className="text-xs text-white/80 mt-0.5">
+      Abra o menu <MoreVertical className="inline h-3.5 w-3.5 mx-0.5 -mt-0.5" aria-label="Menu do navegador" /> do
+      navegador e toque em <strong>“Instalar app”</strong> (ou “Adicionar à tela inicial”).
+    </p>
+  )
+);
 
 export const InstallPrompt = () => {
   const { user } = useAuth();
-  const [installEvent, setInstallEvent] = useState<BeforeInstallPromptEvent | null>(null);
-  const [showIos, setShowIos] = useState(false);
+  const { canPrompt, standalone, ios, promptInstall } = useInstall();
   const [dismissed, setDismissed] = useState(true);
+  const [showHelp, setShowHelp] = useState(false);
 
   // Registra o service worker (offline no curral + instalabilidade)
   useEffect(() => {
@@ -30,30 +35,7 @@ export const InstallPrompt = () => {
   }, []);
 
   useEffect(() => {
-    if (isStandalone() || localStorage.getItem(DISMISS_KEY)) return;
-    setDismissed(false);
-
-    const onBeforeInstall = (e: Event) => {
-      e.preventDefault();
-      setInstallEvent(e as BeforeInstallPromptEvent);
-    };
-    window.addEventListener("beforeinstallprompt", onBeforeInstall);
-
-    // iOS não tem prompt de instalação — mostramos as instruções
-    const ua = navigator.userAgent;
-    if (/iphone|ipad|ipod/i.test(ua)) setShowIos(true);
-
-    const onInstalled = () => {
-      localStorage.setItem(DISMISS_KEY, "1");
-      setInstallEvent(null);
-      setShowIos(false);
-    };
-    window.addEventListener("appinstalled", onInstalled);
-
-    return () => {
-      window.removeEventListener("beforeinstallprompt", onBeforeInstall);
-      window.removeEventListener("appinstalled", onInstalled);
-    };
+    setDismissed(Boolean(localStorage.getItem(DISMISS_KEY)));
   }, []);
 
   const dismiss = () => {
@@ -62,14 +44,18 @@ export const InstallPrompt = () => {
   };
 
   const install = async () => {
-    if (!installEvent) return;
-    await installEvent.prompt();
-    await installEvent.userChoice;
-    dismiss();
+    const outcome = await promptInstall();
+    if (outcome === "accepted") {
+      dismiss();
+    } else if (outcome === "unavailable") {
+      // Prompt nativo indisponível — mostra o caminho manual em vez de falhar em silêncio
+      setShowHelp(true);
+    }
+    // "dismissed" (usuário fechou o prompt nativo): mantém o banner, sem insistir
   };
 
-  // Só para usuário logado, fora do modo instalado, e com algo para oferecer
-  if (!user || dismissed || (!installEvent && !showIos)) return null;
+  if (!user || dismissed || standalone) return null;
+  if (!canPrompt && !ios && !showHelp) return null;
 
   return (
     <div className="fixed inset-x-3 bottom-24 lg:bottom-6 lg:left-auto lg:right-6 lg:max-w-sm z-40 print:hidden">
@@ -78,7 +64,7 @@ export const InstallPrompt = () => {
         <img src="/icons/icon-192.png" alt="" className="h-11 w-11 rounded-xl shrink-0" />
         <div className="flex-1 min-w-0">
           <p className="font-bold text-sm">Instale o app no seu celular</p>
-          {installEvent ? (
+          {canPrompt && !showHelp ? (
             <>
               <p className="text-xs text-white/80 mt-0.5">
                 Acesso direto da tela inicial, em tela cheia — pronto para usar no curral.
@@ -93,10 +79,7 @@ export const InstallPrompt = () => {
               </button>
             </>
           ) : (
-            <p className="text-xs text-white/80 mt-0.5">
-              Toque em <Share className="inline h-3.5 w-3.5 mx-0.5 -mt-0.5" aria-label="Compartilhar" /> (Compartilhar)
-              e depois em <strong>“Adicionar à Tela de Início”</strong>.
-            </p>
+            <InstallHelp ios={ios} />
           )}
         </div>
         <button

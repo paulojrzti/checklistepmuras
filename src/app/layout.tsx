@@ -38,6 +38,13 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className={`${inter.variable} ${playfair.variable} h-full antialiased`}>
       <body suppressHydrationWarning className="min-h-full flex flex-col bg-brand-beige text-brand-gray font-sans">
+        {/* Captura o evento de instalação do PWA antes do React montar (senão ele se perde) */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__epmurasInstallEvent=e;window.dispatchEvent(new Event('epmuras-install-ready'));});",
+          }}
+        />
         <AppShell>
           {children}
         </AppShell>

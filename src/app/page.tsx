@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Button } from '../components/ui/Button';
 import { ClipboardList, History, ShieldAlert, CheckCircle, BarChart3, ChevronRight, Info, Star, GraduationCap, Calculator, Handshake, Briefcase } from 'lucide-react';
 import { BonusBadge } from '../components/bonus/BonusComponents';
+import { InstallButton } from '../components/pwa/InstallButton';
 
 const bonusShortcuts = [
   { href: '/bonus/treinamento', icon: GraduationCap, label: 'Mini Treinamento do Sistema' },
@@ -94,6 +95,11 @@ export default function Home() {
               Como Funciona
             </Button>
           </Link>
+        </div>
+
+        {/* Instalação do app (some quando já está instalado) */}
+        <div className="flex justify-center pt-1">
+          <InstallButton />
         </div>
 
         {/* Bonus shortcuts */}
