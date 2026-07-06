@@ -246,8 +246,8 @@ export const ResultView = ({
               </ScoreRing>
             </div>
             <div className="flex flex-wrap gap-2 mt-3">
-              {infoChips.map(chip => (
-                <span key={chip} className="rounded-full bg-brand-beige px-3 py-1 text-xs font-semibold text-brand-dark-green uppercase tracking-wide">
+              {infoChips.map((chip, i) => (
+                <span key={`${i}-${chip}`} className="rounded-full bg-brand-beige px-3 py-1 text-xs font-semibold text-brand-dark-green uppercase tracking-wide">
                   {chip}
                 </span>
               ))}

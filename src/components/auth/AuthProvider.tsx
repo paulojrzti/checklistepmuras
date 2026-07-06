@@ -1,8 +1,9 @@
 "use client";
 
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { createClient, isSupabaseConfigured } from "../../utils/supabase/client";
+import { scopeStoresToUser } from "../../store/scopeStoresToUser";
 
 export type License = {
   id: string;
@@ -36,6 +37,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(isSupabaseConfigured);
   const [user, setUser] = useState<User | null>(null);
   const [license, setLicense] = useState<License | null>(null);
+  const scopedForRef = useRef<string | null>(null);
+
+  // Aponta o localStorage (avaliações, rascunho, progresso) para o usuário logado
+  const applyStorageScope = useCallback(async (u: User | null) => {
+    const key = u?.id ?? "anon";
+    if (scopedForRef.current === key) return;
+    scopedForRef.current = key;
+    await scopeStoresToUser(u?.id ?? null);
+  }, []);
 
   const fetchLicense = useCallback(
     async (email: string | undefined) => {
@@ -63,6 +73,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (cancelled) return;
       const sessionUser = data.session?.user ?? null;
       setUser(sessionUser);
+      await applyStorageScope(sessionUser);
       await fetchLicense(sessionUser?.email);
       if (!cancelled) setLoading(false);
     };
@@ -71,6 +82,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const { data: sub } = supabase.auth.onAuthStateChange(async (_event, session) => {
       const sessionUser = session?.user ?? null;
       setUser(sessionUser);
+      await applyStorageScope(sessionUser);
       await fetchLicense(sessionUser?.email);
       setLoading(false);
     });
@@ -79,7 +91,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       cancelled = true;
       sub.subscription.unsubscribe();
     };
-  }, [supabase, fetchLicense]);
+  }, [supabase, fetchLicense, applyStorageScope]);
 
   const value: AuthContextValue = {
     configured: isSupabaseConfigured,
