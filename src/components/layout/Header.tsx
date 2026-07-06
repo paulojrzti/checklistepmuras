@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ClipboardList, History, Home, Gift } from 'lucide-react';
+import { ClipboardList, History, Home, Gift, LogOut } from 'lucide-react';
+import { useAuth } from '../auth/AuthProvider';
 
 const navItems = [
   { href: '/', label: 'Início', icon: Home },
@@ -13,6 +14,7 @@ const navItems = [
 
 export const Header = () => {
   const pathname = usePathname();
+  const { user, signOut } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-brand-dark-green/10 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 print:hidden">
@@ -54,19 +56,42 @@ export const Header = () => {
               </Link>
             );
           })}
+          {user && (
+            <button
+              type="button"
+              onClick={() => signOut()}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-full text-brand-gray/70 hover:text-brand-red hover:bg-red-50 transition-colors"
+              aria-label="Sair da conta"
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Sair</span>
+            </button>
+          )}
         </nav>
 
-        {/* Mobile: quick access to bonus hub; bottom nav handles the rest */}
-        <Link
-          href="/bonus"
-          className="lg:hidden relative flex items-center justify-center h-9 w-9 rounded-full bg-brand-beige text-brand-dark-green"
-          aria-label="Bônus de hoje"
-        >
-          <Gift className="h-4.5 w-4.5" />
-          <span className="absolute -top-1 -right-1.5 rounded-full bg-brand-gold text-white text-[8px] font-bold px-1 py-px leading-tight shadow-sm">
-            Hoje!
-          </span>
-        </Link>
+        {/* Mobile: quick access to bonus hub + sair; bottom nav handles the rest */}
+        <div className="lg:hidden flex items-center gap-2">
+          <Link
+            href="/bonus"
+            className="relative flex items-center justify-center h-9 w-9 rounded-full bg-brand-beige text-brand-dark-green"
+            aria-label="Bônus de hoje"
+          >
+            <Gift className="h-4.5 w-4.5" />
+            <span className="absolute -top-1 -right-1.5 rounded-full bg-brand-gold text-white text-[8px] font-bold px-1 py-px leading-tight shadow-sm">
+              Hoje!
+            </span>
+          </Link>
+          {user && (
+            <button
+              type="button"
+              onClick={() => signOut()}
+              className="flex items-center justify-center h-9 w-9 rounded-full bg-brand-beige text-brand-gray/70 hover:text-brand-red transition-colors"
+              aria-label="Sair da conta"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
+          )}
+        </div>
       </div>
     </header>
   );
