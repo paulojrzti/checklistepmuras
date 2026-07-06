@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node \"C:\\\\Users\\\\depia\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-depia-Desktop-checklistempuras\\\\58742f76-8363-4ff4-8e49-b6e4a63b4d7b\\\\scratchpad\\\\gen-icons.mjs\")",
+      "Bash(node scripts/gen-icons.mjs)"
+    ]
+  }
+}

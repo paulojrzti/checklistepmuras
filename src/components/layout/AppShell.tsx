@@ -4,6 +4,7 @@ import { Header } from './Header';
 import { BottomNav } from './BottomNav';
 import { AuthProvider } from '../auth/AuthProvider';
 import { AuthGate } from '../auth/AuthGate';
+import { InstallPrompt } from '../pwa/InstallPrompt';
 
 export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
@@ -26,6 +27,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
         </div>
       </footer>
       <BottomNav />
+      <InstallPrompt />
     </div>
     </AuthProvider>
   );

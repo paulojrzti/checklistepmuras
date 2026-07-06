@@ -20,6 +20,14 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "Checklist EPMURAS | Compra de Gado",
   description: "Avalie estrutura, precocidade, musculatura, umbigo, raça, aprumos, sexualidade e fatores comerciais antes de decidir se vale a pena comprar um animal.",
+  icons: {
+    apple: "/apple-touch-icon.png",
+  },
+  appleWebApp: {
+    capable: true,
+    title: "EPMURAS",
+    statusBarStyle: "default",
+  },
 };
 
 export default function RootLayout({
