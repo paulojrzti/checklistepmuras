@@ -337,6 +337,15 @@ export default function AvaliarPage() {
     if (currentStep === 2) {
       return evaluation.breedGroup !== 'nao_informado' && evaluation.objective !== 'nao_informado';
     }
+    if (currentStep === 3) {
+      return epmurasQuestions.slice(0, 3).every(q => evaluation.answers[q.key as keyof typeof evaluation.answers] !== 'nao_informado');
+    }
+    if (currentStep === 4) {
+      return epmurasQuestions.slice(3, 7).every(q => evaluation.answers[q.key as keyof typeof evaluation.answers] !== 'nao_informado');
+    }
+    if (currentStep === 5) {
+      return commercialQuestions.every(q => evaluation.answers[q.key as keyof typeof evaluation.answers] !== 'nao_informado');
+    }
     return true;
   };
 
