@@ -236,6 +236,12 @@ export default function AvaliarPage() {
                         Para cruzados, não avalie pureza racial. Avalie padronização, tipo de carcaça, adaptação e aceitação comercial.
                       </p>
                     )}
+                    {q.image && (
+                      <div className="rounded-xl overflow-hidden border border-gray-200 shadow-sm">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={q.image} alt={`Exemplo Bom, Médio e Ruim: ${q.question}`} className="w-full h-auto" />
+                      </div>
+                    )}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       {(['bom', 'medio', 'ruim'] as const).map(level => (
                         <AnswerCard

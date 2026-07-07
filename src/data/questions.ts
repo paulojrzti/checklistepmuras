@@ -1,6 +1,8 @@
 export type QuestionItem = {
   key: string;
   question: string;
+  /** Imagem comparativa Bom/Médio/Ruim (opcional), em /public. */
+  image?: string;
   answers: {
     bom: { points: number; text: string };
     medio: { points: number; text: string };
@@ -12,6 +14,7 @@ export const epmurasQuestions: QuestionItem[] = [
   {
     key: "estrutura",
     question: "O animal tem tamanho, comprimento e estrutura compatíveis com idade, raça e objetivo?",
+    image: "/images/epmuras/estrutura.png",
     answers: {
       bom: { points: 6, text: "Estrutura equilibrada, bom comprimento, bom volume corporal e sem exagero de tamanho." },
       medio: { points: 4, text: "Um pouco pequeno ou um pouco grande, mas ainda funcional para o objetivo." },
@@ -21,6 +24,7 @@ export const epmurasQuestions: QuestionItem[] = [
   {
     key: "precocidade",
     question: "O animal demonstra precocidade e tendência a terminar bem?",
+    image: "/images/epmuras/precocidade.png",
     answers: {
       bom: { points: 6, text: "Costelas profundas, virilha baixa, bom volume e aparência de animal que termina mais cedo." },
       medio: { points: 4, text: "Profundidade e acabamento aceitáveis, mas ainda falta corpo ou expressão." },
@@ -30,6 +34,7 @@ export const epmurasQuestions: QuestionItem[] = [
   {
     key: "musculosidade",
     question: "O animal apresenta musculatura bem distribuída?",
+    image: "/images/epmuras/musculosidade.png",
     answers: {
       bom: { points: 6, text: "Boa musculatura em posterior, lombo, paleta e garupa, com distribuição equilibrada." },
       medio: { points: 4, text: "Musculatura aceitável, mas sem grande expressão ou com pequenas falhas." },
@@ -39,6 +44,7 @@ export const epmurasQuestions: QuestionItem[] = [
   {
     key: "umbigo",
     question: "O umbigo, bainha ou prepúcio é funcional e sem risco para o animal?",
+    image: "/images/epmuras/umbigo.png",
     answers: {
       bom: { points: 4, text: "Funcional, bem posicionado, sem excesso, sem lesão e sem risco aparente." },
       medio: { points: 2, text: "Levemente maior ou menor que o ideal, mas ainda funcional." },
